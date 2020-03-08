@@ -1,6 +1,6 @@
 package com.demo.api.account.validator;
 
-import com.demo.common.InvalidDataException;
+import com.demo.api.exception.InvalidDataException;
 import com.google.inject.Singleton;
 
 import java.math.BigDecimal;

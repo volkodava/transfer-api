@@ -1,7 +1,5 @@
 package com.demo.api.account.model;
 
-import com.demo.api.model.AccountId;
-
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -12,13 +10,6 @@ public final class Account {
     private Account(AccountId id, BigDecimal balance) {
         this.id = Objects.requireNonNull(id, "Id must be provided");
         this.balance = Objects.requireNonNull(balance, "Balance must be provided");
-    }
-
-    public static Account copyOf(Account orig) {
-        if (orig == null) {
-            return null;
-        }
-        return new Account(orig.id, orig.balance);
     }
 
     public static Builder builder() {

@@ -7,7 +7,7 @@ import com.demo.api.common.ApiResponse;
 import com.demo.api.common.TestContext;
 import com.demo.api.common.TestHttpClient;
 import com.demo.common.BootstrapConfig;
-import com.demo.common.SocketUtils;
+import com.demo.util.SocketUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;

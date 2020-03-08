@@ -1,15 +1,15 @@
 package com.demo.api.transfer.controller;
 
-import com.demo.api.model.AccountId;
-import com.demo.api.model.TransferId;
+import com.demo.api.account.model.AccountId;
+import com.demo.api.transfer.model.TransferId;
 import com.demo.api.transfer.controller.validator.TransferRequestValidator;
 import com.demo.api.transfer.dto.NewTransferRequest;
 import com.demo.api.transfer.dto.TransferIdResponse;
 import com.demo.api.transfer.dto.TransferResponse;
 import com.demo.api.transfer.model.Transfer;
 import com.demo.api.transfer.service.TransferService;
-import com.demo.common.ErrorResponse;
-import com.demo.common.NotFoundException;
+import com.demo.api.common.ErrorResponse;
+import com.demo.api.exception.NotFoundException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.javalin.http.Context;

@@ -11,7 +11,7 @@ import com.demo.api.transfer.dto.TransferIdResponse;
 import com.demo.api.transfer.dto.TransferResponse;
 import com.demo.api.transfer.model.TransferState;
 import com.demo.common.BootstrapConfig;
-import com.demo.common.SocketUtils;
+import com.demo.util.SocketUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;

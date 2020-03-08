@@ -1,4 +1,6 @@
-package com.demo.api.model;
+package com.demo.api.account.model;
+
+import com.demo.api.model.Id;
 
 public final class AccountId extends Id {
     public AccountId(String value) {

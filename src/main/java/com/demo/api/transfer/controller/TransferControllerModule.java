@@ -1,6 +1,6 @@
 package com.demo.api.transfer.controller;
 
-import com.demo.common.Routing;
+import com.demo.api.common.Routing;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 

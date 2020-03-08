@@ -1,8 +1,8 @@
 package com.demo.api.transfer.service;
 
 
-import com.demo.api.model.AccountId;
-import com.demo.api.model.TransferId;
+import com.demo.api.account.model.AccountId;
+import com.demo.api.transfer.model.TransferId;
 import com.demo.api.transfer.model.Transfer;
 
 import java.math.BigDecimal;

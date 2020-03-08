@@ -1,4 +1,4 @@
-package com.demo.common;
+package com.demo.util;
 
 import java.io.IOException;
 import java.net.ServerSocket;

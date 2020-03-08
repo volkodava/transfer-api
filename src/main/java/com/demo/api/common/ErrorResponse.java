@@ -1,4 +1,4 @@
-package com.demo.common;
+package com.demo.api.common;
 
 public class ErrorResponse {
     private String message;

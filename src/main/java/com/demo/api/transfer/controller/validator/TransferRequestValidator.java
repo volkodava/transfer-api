@@ -1,8 +1,8 @@
 package com.demo.api.transfer.controller.validator;
 
-import com.demo.api.model.TransferId;
+import com.demo.api.transfer.model.TransferId;
 import com.demo.api.transfer.dto.NewTransferRequest;
-import com.demo.common.InvalidDataException;
+import com.demo.api.exception.InvalidDataException;
 import com.google.inject.Singleton;
 import io.javalin.http.Context;
 

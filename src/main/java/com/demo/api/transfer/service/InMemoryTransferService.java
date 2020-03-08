@@ -1,14 +1,14 @@
 package com.demo.api.transfer.service;
 
-import com.demo.api.model.AccountId;
-import com.demo.api.model.TransferId;
+import com.demo.api.account.model.AccountId;
+import com.demo.api.transfer.model.TransferId;
 import com.demo.api.transfer.manager.TransferManager;
 import com.demo.api.transfer.model.Transfer;
 import com.demo.api.transfer.model.TransferEvent;
 import com.demo.api.transfer.model.TransferState;
 import com.demo.api.transfer.repository.TransferRepository;
 import com.demo.api.transfer.validator.TransferValidator;
-import com.demo.common.TooBusyException;
+import com.demo.api.exception.TooBusyException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 

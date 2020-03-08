@@ -1,7 +1,5 @@
 package com.demo.api.common;
 
-import com.demo.common.ErrorResponse;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

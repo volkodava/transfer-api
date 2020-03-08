@@ -1,6 +1,6 @@
 package com.demo.api.transfer.validator;
 
-import com.demo.api.model.AccountId;
+import com.demo.api.account.model.AccountId;
 
 import java.math.BigDecimal;
 

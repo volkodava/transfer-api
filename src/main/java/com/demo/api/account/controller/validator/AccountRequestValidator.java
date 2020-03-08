@@ -1,8 +1,8 @@
 package com.demo.api.account.controller.validator;
 
 import com.demo.api.account.dto.NewAccountRequest;
-import com.demo.api.model.AccountId;
-import com.demo.common.InvalidDataException;
+import com.demo.api.account.model.AccountId;
+import com.demo.api.exception.InvalidDataException;
 import com.google.inject.Singleton;
 import io.javalin.http.Context;
 

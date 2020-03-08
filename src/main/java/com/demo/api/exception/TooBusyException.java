@@ -1,4 +1,4 @@
-package com.demo.common;
+package com.demo.api.exception;
 
 public class TooBusyException extends RuntimeException {
     public TooBusyException() {

@@ -1,6 +1,6 @@
 package com.demo.api.transfer.repository;
 
-import com.demo.api.model.TransferId;
+import com.demo.api.transfer.model.TransferId;
 import com.demo.api.transfer.model.Transfer;
 
 import java.util.Collection;

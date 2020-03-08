@@ -8,7 +8,7 @@ import com.demo.api.transfer.repository.TransferRepository;
 import com.demo.api.transfer.store.EventStore;
 import com.demo.api.transfer.validator.DebitTransferValidator;
 import com.demo.common.BootstrapConfig;
-import com.demo.common.InvalidDataException;
+import com.demo.api.exception.InvalidDataException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;

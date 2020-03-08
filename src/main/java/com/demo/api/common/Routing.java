@@ -1,4 +1,4 @@
-package com.demo.common;
+package com.demo.api.common;
 
 import com.google.inject.Injector;
 

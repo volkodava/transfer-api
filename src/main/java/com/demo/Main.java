@@ -1,7 +1,7 @@
 package com.demo;
 
 import com.demo.common.BootstrapConfig;
-import com.demo.common.SocketUtils;
+import com.demo.util.SocketUtils;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.slf4j.Logger;

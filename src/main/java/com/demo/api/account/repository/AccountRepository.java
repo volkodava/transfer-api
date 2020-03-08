@@ -1,7 +1,7 @@
 package com.demo.api.account.repository;
 
 import com.demo.api.account.model.Account;
-import com.demo.api.model.AccountId;
+import com.demo.api.account.model.AccountId;
 
 import java.util.function.BiFunction;
 

@@ -1,8 +1,12 @@
 package com.demo;
 
 import com.demo.api.account.AccountModule;
+import com.demo.api.common.ErrorResponse;
+import com.demo.api.exception.InvalidDataException;
+import com.demo.api.exception.NotFoundException;
+import com.demo.api.exception.TooBusyException;
 import com.demo.api.transfer.TransferModule;
-import com.demo.common.*;
+import com.demo.common.BootstrapConfig;
 import com.google.inject.AbstractModule;
 import io.javalin.Javalin;
 import io.javalin.http.HttpResponseException;
@@ -43,12 +47,6 @@ public class BootstrapModule extends AbstractModule {
         }).exception(NotFoundException.class, (exception, ctx) -> {
             ctx.json(new ErrorResponse(exception.getMessage()));
             ctx.status(HttpStatus.NOT_FOUND_404);
-        }).exception(NullPointerException.class, (exception, ctx) -> {
-            ctx.json(new ErrorResponse(exception.getMessage()));
-            ctx.status(HttpStatus.BAD_REQUEST_400);
-        }).exception(IllegalArgumentException.class, (exception, ctx) -> {
-            ctx.json(new ErrorResponse(exception.getMessage()));
-            ctx.status(HttpStatus.BAD_REQUEST_400);
         }).exception(InvalidDataException.class, (exception, ctx) -> {
             ctx.json(new ErrorResponse(exception.getMessage()));
             ctx.status(HttpStatus.BAD_REQUEST_400);

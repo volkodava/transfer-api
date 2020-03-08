@@ -1,6 +1,6 @@
 package com.demo.api.account.controller;
 
-import com.demo.common.Routing;
+import com.demo.api.common.Routing;
 import io.javalin.Javalin;
 
 import javax.inject.Inject;

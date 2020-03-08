@@ -1,4 +1,6 @@
-package com.demo.api.model;
+package com.demo.api.transfer.model;
+
+import com.demo.api.model.Id;
 
 public final class TransferId extends Id {
     public TransferId(String value) {

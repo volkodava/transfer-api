@@ -1,6 +1,5 @@
 package com.demo.api.common;
 
-import com.demo.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

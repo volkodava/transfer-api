@@ -2,14 +2,14 @@ package com.demo.api.transfer.service;
 
 import com.demo.api.account.model.Account;
 import com.demo.api.account.service.AccountService;
-import com.demo.api.model.AccountId;
+import com.demo.api.account.model.AccountId;
 import com.demo.api.transfer.manager.TransferManager;
 import com.demo.api.transfer.model.TransferEvent;
 import com.demo.api.transfer.repository.TransferRepository;
 import com.demo.api.transfer.validator.DebitTransferValidator;
 import com.demo.api.transfer.validator.TransferValidator;
-import com.demo.common.InvalidDataException;
-import com.demo.common.TooBusyException;
+import com.demo.api.exception.InvalidDataException;
+import com.demo.api.exception.TooBusyException;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import net.lamberto.junit.GuiceJUnitRunner;

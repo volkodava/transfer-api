@@ -2,8 +2,8 @@ package com.demo.api.transfer.validator;
 
 import com.demo.api.account.model.Account;
 import com.demo.api.account.service.AccountService;
-import com.demo.api.model.AccountId;
-import com.demo.common.InvalidDataException;
+import com.demo.api.account.model.AccountId;
+import com.demo.api.exception.InvalidDataException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 

@@ -46,7 +46,6 @@ public class TransferServiceTest {
 
     @Test
     public void shouldAcceptAndProcessTransferIfSenderWithSufficientBalance() {
-
         // Given
         AccountId sourceAccountId = accountService.createNew(BigDecimal.ONE);
         AccountId targetAccountId = accountService.createNew(BigDecimal.ZERO);

@@ -104,4 +104,50 @@ API documentation available after application starts at `http://localhost:${PORT
 
 ## Project Structure
 
-TBD
+- the code of solution ([src/main/java/com/demo](./src/main/java/com/demo)):
+```
+├── api                        (API implementation)
+│   ├── account                (Account API)
+│   │   ├── controller         (REST API controller)
+│   │   │   └── validator      (User requests validator)
+│   │   ├── dto                (Data transfer object(s))
+│   │   ├── model              (Business model)
+│   │   ├── repository         (Data persistence logic)
+│   │   ├── service            (Business logic)
+│   │   └── validator          (Data validator(s), used in business logic)
+│   ├── common                 (API-level common classes both for account and transfer APIs)
+│   ├── exception              (API exceptions)
+│   ├── model                  (Shared business model)
+│   └── transfer               (Transfer API)
+│       ├── controller         ...
+│       │   └── validator      ...
+│       ├── dto                ...
+│       ├── manager            (Business logic to process events, pipeline executor)
+│       ├── model              ...
+│       ├── repository         ...
+│       ├── service            ...
+│       ├── store              (Simple event store implementation)
+│       └── validator          ...
+├── common                     (Application-level shared classes)
+└── util                       (Utility classes)
+```
+
+- unit tests ([src/test/java/com/demo](./src/test/java/com/demo)):
+```
+└── api                        (API tests)
+    ├── account                (Account API)
+    │   └── service            (Business logic tests)
+    └── transfer               (Transfer API)
+        ├── manager            (Event-processing tests)
+        └── service            ...
+```
+
+- integration tests ([src/integrationTest/java/com/demo](./src/integrationTest/java/com/demo)):
+```
+└── api                        (API tests)
+    ├── account                (Account API)
+    │   └── controller         (REST API controller tests)
+    ├── common                 (API-level shared classes)
+    └── transfer               (Transfer API)
+        └── controller         ...
+```

@@ -58,6 +58,10 @@ Mission critical pieces of applications covered with tests.
 
 - Execute unit + integration tests: `mvn integration-test`
 
+## CI/CD builds
+
+CI/CD Builds: https://github.com/volkodava/transfer-api/actions
+
 ## API Documentation
 
 TBD

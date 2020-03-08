@@ -57,3 +57,11 @@ Mission critical pieces of applications covered with tests.
 - Execute unit tests: `mvn test`
 
 - Execute unit + integration tests: `mvn integration-test`
+
+## API Documentation
+
+TBD
+
+## Project Structure
+
+TBD

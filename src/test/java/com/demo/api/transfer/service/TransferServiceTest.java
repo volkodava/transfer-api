@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import java.math.BigDecimal;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(GuiceJUnitRunner.class)

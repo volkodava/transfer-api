@@ -71,7 +71,7 @@ public class TransferManagerConcurrentRealTest {
     }
 
     @Test
-    public void shouldCompleteWithInitialBalanceIfHasCompensatedTransfer() throws Exception {
+    public void shouldCompleteWithInitialBalanceIfHasCompensatedTransfer() {
         // Given
         BigDecimal amount = BigDecimal.ONE;
         BigDecimal initialBalance = BigDecimal.valueOf(config.getBufferSize());

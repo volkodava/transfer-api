@@ -1,12 +1,12 @@
 package com.demo.api.account.controller;
 
 import com.demo.api.account.controller.validator.AccountRequestValidator;
+import com.demo.api.account.dto.AccountIdResponse;
 import com.demo.api.account.dto.AccountResponse;
 import com.demo.api.account.dto.NewAccountRequest;
 import com.demo.api.account.model.Account;
 import com.demo.api.account.service.AccountService;
 import com.demo.api.model.AccountId;
-import com.demo.api.transfer.dto.TransferIdResponse;
 import com.demo.common.ErrorResponse;
 import com.demo.common.NotFoundException;
 import com.google.inject.Inject;
@@ -36,7 +36,7 @@ public class AccountController {
             tags = {"Account"},
             requestBody = @OpenApiRequestBody(content = {@OpenApiContent(from = NewAccountRequest.class)}),
             responses = {
-                    @OpenApiResponse(status = "201", content = {@OpenApiContent(from = TransferIdResponse.class)}),
+                    @OpenApiResponse(status = "201", content = {@OpenApiContent(from = AccountIdResponse.class)}),
                     @OpenApiResponse(status = "400", content = {@OpenApiContent(from = ErrorResponse.class)})
             }
     )
@@ -45,7 +45,7 @@ public class AccountController {
         AccountId accountId = accountService.createNew(request.getInitialBalance());
 
         ctx.header("Location", String.format("/accounts/%s", accountId.getValue()));
-        ctx.json(new TransferIdResponse(accountId.getValue()));
+        ctx.json(new AccountIdResponse(accountId.getValue()));
         ctx.status(HttpStatus.CREATED_201);
     }
 

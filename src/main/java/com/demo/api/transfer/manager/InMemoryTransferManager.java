@@ -1,16 +1,20 @@
 package com.demo.api.transfer.manager;
 
+import com.demo.api.account.model.Account;
 import com.demo.api.account.repository.AccountRepository;
 import com.demo.api.transfer.model.TransferEvent;
+import com.demo.api.transfer.model.TransferState;
 import com.demo.api.transfer.repository.TransferRepository;
 import com.demo.api.transfer.store.EventStore;
 import com.demo.api.transfer.validator.DebitTransferValidator;
 import com.demo.common.BootstrapConfig;
+import com.demo.common.InvalidDataException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Singleton
@@ -48,6 +52,7 @@ public class InMemoryTransferManager implements TransferManager {
                 .withConfig(config)
                 .withRegisterTransferFn(this::onRegisterTransfer)
                 .withValidateTransferFn(this::onValidateTransfer)
+                .withIsValidTransferFn(this::isValidTransfer)
                 .withWithdrawSourceFn(this::onWithdrawSource)
                 .withDepositTargetFn(this::onDepositTarget)
                 .withFinalizeTransferFn(this::onFinalizeTransfer)
@@ -64,27 +69,87 @@ public class InMemoryTransferManager implements TransferManager {
     }
 
     private TransferEvent onRegisterTransfer(TransferEvent event) {
-        throw new UnsupportedOperationException();
+        LOGGER.debug(String.format("%s --- onRegisterTransfer: %s", Thread.currentThread().getName(), event));
+        TransferEvent newState = TransferEvent.builder().from(event)
+                .withState(TransferState.PENDING)
+                .withDetails("Transfer processing")
+                .build();
+        transferRepository.save(newState.getTransferId(), newState.asTransfer());
+        return newState;
     }
 
     private TransferEvent onValidateTransfer(TransferEvent event) {
-        throw new UnsupportedOperationException();
+        LOGGER.debug(String.format("%s --- onValidateTransfer: %s", Thread.currentThread().getName(), event));
+        try {
+            transferValidator.validate(event.getSourceId(), event.getTargetId(), event.getAmount());
+            return TransferEvent.builder().from(event)
+                    .withState(TransferState.VALIDATED)
+                    .withDetails("Transfer is valid")
+                    .build();
+        } catch (InvalidDataException e) {
+            TransferEvent newState = TransferEvent.builder().from(event)
+                    .withState(TransferState.ERROR)
+                    .withDetails(e.getMessage())
+                    .build();
+            transferRepository.save(newState.getTransferId(), newState.asTransfer());
+            return newState;
+        }
+    }
+
+    private boolean isValidTransfer(TransferEvent event) {
+        return event.getState() != TransferState.ERROR;
     }
 
     private TransferEvent onWithdrawSource(TransferEvent event) {
-        throw new UnsupportedOperationException();
+        LOGGER.debug(String.format("%s --- onWithdrawSource: %s", Thread.currentThread().getName(), event));
+        accountRepository.executeUpdate(event.getSourceId(), (accountId, prevAccount) -> {
+            BigDecimal newBalance = prevAccount.getBalance().subtract(event.getAmount());
+            return Account.builder()
+                    .withId(accountId)
+                    .withBalance(newBalance)
+                    .build();
+        });
+
+        return TransferEvent.builder().from(event)
+                .withState(TransferState.SOURCE_WITHDRAWN)
+                .withDetails("Source account balance updated")
+                .build();
     }
 
     private TransferEvent onDepositTarget(TransferEvent event) {
-        throw new UnsupportedOperationException();
+        LOGGER.debug(String.format("%s --- onDepositTarget: %s", Thread.currentThread().getName(), event));
+        accountRepository.executeUpdate(event.getTargetId(), (accountId, prevAccount) -> {
+            BigDecimal newBalance = prevAccount.getBalance().add(event.getAmount());
+            return Account.builder()
+                    .withId(accountId)
+                    .withBalance(newBalance)
+                    .build();
+        });
+
+        return TransferEvent.builder().from(event)
+                .withState(TransferState.TARGET_DEPOSITED)
+                .withDetails("Target account balance updated")
+                .build();
     }
 
     private TransferEvent onFinalizeTransfer(TransferEvent event) {
-        throw new UnsupportedOperationException();
+        LOGGER.debug(String.format("%s --- onFinalizeTransfer: %s", Thread.currentThread().getName(), event));
+        if (TransferState.TARGET_DEPOSITED == event.getState()) {
+            return TransferEvent.builder().from(event)
+                    .withState(TransferState.DONE)
+                    .withDetails("Transfer processed")
+                    .build();
+        }
+
+        return TransferEvent.builder().from(event)
+                .withState(TransferState.ERROR)
+                .withDetails(String.format("Transfer is not valid: %s", event.getState()))
+                .build();
     }
 
     private void onCompleteTransfer(TransferEvent event) {
-        throw new UnsupportedOperationException();
+        LOGGER.debug(String.format("%s --- onCompleteTransfer: %s", Thread.currentThread().getName(), event));
+        transferRepository.save(event.getTransferId(), event.asTransfer());
     }
 
     private void onError(Throwable throwable) {

@@ -3,11 +3,19 @@ package com.demo.api.transfer.manager;
 import com.demo.api.transfer.model.TransferEvent;
 import com.demo.api.transfer.store.EventStore;
 import com.demo.common.BootstrapConfig;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.flowables.ConnectableFlowable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import org.reactivestreams.Publisher;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class PipelineExecutor {
     private final EventStore<TransferEvent> eventSource;
@@ -16,16 +24,21 @@ public class PipelineExecutor {
 
     private final Function<TransferEvent, TransferEvent> registerTransferFn;
     private final Function<TransferEvent, TransferEvent> validateTransferFn;
+    private final Predicate<TransferEvent> isValidTransferFn;
     private final Function<TransferEvent, TransferEvent> withdrawSourceFn;
     private final Function<TransferEvent, TransferEvent> depositTargetFn;
     private final Function<TransferEvent, TransferEvent> finalizeTransferFn;
     private final Consumer<TransferEvent> completeTransferFn;
     private final Consumer<Throwable> errorHandler;
 
+    private Disposable validSubscriber;
+    private Disposable nonValidSubscriber;
+
     private PipelineExecutor(EventStore<TransferEvent> eventSource,
                              BootstrapConfig config,
                              Function<TransferEvent, TransferEvent> registerTransferFn,
                              Function<TransferEvent, TransferEvent> validateTransferFn,
+                             Predicate<TransferEvent> isValidTransferFn,
                              Function<TransferEvent, TransferEvent> withdrawSourceFn,
                              Function<TransferEvent, TransferEvent> depositTargetFn,
                              Function<TransferEvent, TransferEvent> finalizeTransferFn,
@@ -35,6 +48,7 @@ public class PipelineExecutor {
         this.config = Objects.requireNonNull(config, "Config must be provided");
         this.registerTransferFn = Objects.requireNonNull(registerTransferFn, "Register transfer function must be provided");
         this.validateTransferFn = Objects.requireNonNull(validateTransferFn, "Validate transfer function must be provided");
+        this.isValidTransferFn = Objects.requireNonNull(isValidTransferFn, "IsValid transfer function must be provided");
         this.withdrawSourceFn = Objects.requireNonNull(withdrawSourceFn, "Withdraw source function must be provided");
         this.depositTargetFn = Objects.requireNonNull(depositTargetFn, "Deposit target function must be provided");
         this.finalizeTransferFn = Objects.requireNonNull(finalizeTransferFn, "Finalize transfer function must be provided");
@@ -48,11 +62,54 @@ public class PipelineExecutor {
     }
 
     public void start() {
-        throw new UnsupportedOperationException();
+        running.set(true);
+        AtomicInteger partitioner = new AtomicInteger(0);
+        Predicate<TransferEvent> isNonValidTransferFn = isValidTransferFn.negate();
+        // withdraw in single thread
+        ConnectableFlowable<TransferEvent> flow = createFlow()
+                .onErrorResumeNext(this::onError)
+                .subscribeOn(Schedulers.single()) // withdraw in single thread
+                .map(registerTransferFn::apply)
+                .map(validateTransferFn::apply)
+                .publish();
+        validSubscriber = flow.filter(isValidTransferFn::test)
+                .map(withdrawSourceFn::apply)
+                .groupBy(event -> partitioner.updateAndGet(i -> Math.max(i + 1, 0)) % config.getMaxThreads())
+                .flatMap(grp -> grp.observeOn(Schedulers.io())
+                        .map(depositTargetFn::apply)) // deposit in parallel
+                .map(finalizeTransferFn::apply)
+                .subscribe(completeTransferFn::accept);
+        nonValidSubscriber = flow.filter(isNonValidTransferFn::test)
+                .subscribe(completeTransferFn::accept);
+
+        flow.connect();
     }
 
     public void stop() {
-        throw new UnsupportedOperationException();
+        running.set(false);
+        validSubscriber.dispose();
+        nonValidSubscriber.dispose();
+    }
+
+    private Publisher<TransferEvent> onError(Throwable throwable) {
+        errorHandler.accept(throwable);
+        return Flowable.empty();
+    }
+
+    private Flowable<TransferEvent> createFlow() {
+        return Flowable.generate(emitter -> {
+            Optional<TransferEvent> event = Optional.empty();
+            while (!Thread.currentThread().isInterrupted()
+                    && running.get()
+                    && event.isEmpty()) {
+                event = eventSource.take();
+                event.ifPresent(emitter::onNext);
+            }
+
+            if (!running.get()) {
+                emitter.onComplete();
+            }
+        });
     }
 
     public static final class Builder {
@@ -60,6 +117,7 @@ public class PipelineExecutor {
         private BootstrapConfig config;
         private Function<TransferEvent, TransferEvent> registerTransferFn;
         private Function<TransferEvent, TransferEvent> validateTransferFn;
+        private Predicate<TransferEvent> isValidTransferFn;
         private Function<TransferEvent, TransferEvent> withdrawSourceFn;
         private Function<TransferEvent, TransferEvent> depositTargetFn;
         private Function<TransferEvent, TransferEvent> finalizeTransferFn;
@@ -83,6 +141,11 @@ public class PipelineExecutor {
 
         public Builder withValidateTransferFn(Function<TransferEvent, TransferEvent> validateTransferFn) {
             this.validateTransferFn = validateTransferFn;
+            return this;
+        }
+
+        public Builder withIsValidTransferFn(Predicate<TransferEvent> isValidTransferFn) {
+            this.isValidTransferFn = isValidTransferFn;
             return this;
         }
 
@@ -112,7 +175,7 @@ public class PipelineExecutor {
         }
 
         public PipelineExecutor build() {
-            return new PipelineExecutor(eventSource, config, registerTransferFn, validateTransferFn, withdrawSourceFn,
+            return new PipelineExecutor(eventSource, config, registerTransferFn, validateTransferFn, isValidTransferFn, withdrawSourceFn,
                     depositTargetFn, finalizeTransferFn, completeTransferFn, errorHandler);
         }
     }

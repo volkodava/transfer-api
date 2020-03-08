@@ -11,8 +11,8 @@ public final class TransferEvent {
     private final AccountId sourceId;
     private final AccountId targetId;
     private final BigDecimal amount;
-    private TransferState state;
-    private String details;
+    private final TransferState state;
+    private final String details;
 
     private TransferEvent(TransferId transferId, AccountId sourceId, AccountId targetId, BigDecimal amount,
                           TransferState state, String details) {
@@ -59,16 +59,8 @@ public final class TransferEvent {
         return state;
     }
 
-    public void setState(TransferState state) {
-        this.state = state;
-    }
-
     public String getDetails() {
         return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
     }
 
     @Override
@@ -101,6 +93,16 @@ public final class TransferEvent {
         private BigDecimal amount;
         private TransferState state;
         private String details;
+
+        public Builder from(TransferEvent source) {
+            this.transferId = source.transferId;
+            this.sourceId = source.sourceId;
+            this.targetId = source.targetId;
+            this.amount = source.amount;
+            this.state = source.state;
+            this.details = source.details;
+            return this;
+        }
 
         public Builder withTransferId(TransferId transferId) {
             this.transferId = transferId;

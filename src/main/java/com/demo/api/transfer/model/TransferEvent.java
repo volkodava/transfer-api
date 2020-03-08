@@ -7,16 +7,16 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public final class TransferEvent {
-    private final TransferId id;
+    private final TransferId transferId;
     private final AccountId sourceId;
     private final AccountId targetId;
     private final BigDecimal amount;
     private TransferState state;
     private String details;
 
-    private TransferEvent(TransferId id, AccountId sourceId, AccountId targetId, BigDecimal amount,
+    private TransferEvent(TransferId transferId, AccountId sourceId, AccountId targetId, BigDecimal amount,
                           TransferState state, String details) {
-        this.id = Objects.requireNonNull(id, "Id must be provided");
+        this.transferId = Objects.requireNonNull(transferId, "Transfer id must be provided");
         this.sourceId = Objects.requireNonNull(sourceId, "Source account id must be provided");
         this.targetId = Objects.requireNonNull(targetId, "Target account id must be provided");
         this.amount = Objects.requireNonNull(amount, "Amount must be provided");
@@ -30,7 +30,7 @@ public final class TransferEvent {
 
     public Transfer asTransfer() {
         return Transfer.builder()
-                .withId(id)
+                .withId(transferId)
                 .withSourceId(sourceId)
                 .withTargetId(targetId)
                 .withAmount(amount)
@@ -39,8 +39,8 @@ public final class TransferEvent {
                 .build();
     }
 
-    public TransferId getId() {
-        return id;
+    public TransferId getTransferId() {
+        return transferId;
     }
 
     public AccountId getSourceId() {
@@ -73,7 +73,7 @@ public final class TransferEvent {
 
     @Override
     public String toString() {
-        return "#" + id
+        return "#" + transferId
                 + ", Source=" + sourceId
                 + ", Target=" + targetId
                 + ", Amount=" + amount
@@ -86,24 +86,24 @@ public final class TransferEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TransferEvent that = (TransferEvent) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(transferId, that.transferId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(transferId);
     }
 
     public static final class Builder {
-        private TransferId id;
+        private TransferId transferId;
         private AccountId sourceId;
         private AccountId targetId;
         private BigDecimal amount;
         private TransferState state;
         private String details;
 
-        public Builder withId(TransferId id) {
-            this.id = id;
+        public Builder withTransferId(TransferId transferId) {
+            this.transferId = transferId;
             return this;
         }
 
@@ -133,7 +133,7 @@ public final class TransferEvent {
         }
 
         public TransferEvent build() {
-            return new TransferEvent(id, sourceId, targetId, amount, state, details);
+            return new TransferEvent(transferId, sourceId, targetId, amount, state, details);
         }
     }
 }

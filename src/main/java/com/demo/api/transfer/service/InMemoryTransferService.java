@@ -39,7 +39,7 @@ public class InMemoryTransferService implements TransferService {
 
         TransferId transferId = TransferId.valueOf(UUID.randomUUID().toString());
         boolean submitted = transferManager.submitEvent(TransferEvent.builder()
-                .withId(transferId)
+                .withTransferId(transferId)
                 .withSourceId(sourceAccountId)
                 .withTargetId(targetAccountId)
                 .withAmount(amount)

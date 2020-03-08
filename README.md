@@ -44,7 +44,7 @@ Mission critical pieces of applications covered with tests.
 
 ## Tools, Frameworks, Libraries
 
-- Java 12+
+- Java 11+
 - [Maven](https://maven.apache.org/) build-automation tool
 - [javalin](https://javalin.io/) lightweight web framework to create REST APIs
 - [guice](https://github.com/google/guice) lightweight dependency injection framework

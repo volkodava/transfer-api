@@ -29,7 +29,9 @@ Transfer processing consists of the following steps:
     - finalize transfer, check transfer state and update accordingly (single thread, thread-N)
     - complete transfer, save transfer to in-memory storage (single thread, thread-N)
 
-Java `ConcurrentHashMap` used as in-memory storage. Withdraw and deposit operations on accounts performed atomically.
+Java `ConcurrentHashMap` used as in-memory storage. Withdraw and deposit operations on accounts performed atomically. 
+
+Mission critical pieces of applications covered with tests.
 
 ## Tools, Frameworks, Libraries
 

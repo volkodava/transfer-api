@@ -22,7 +22,7 @@ Solution done with assumption that we deal only with debit accounts.
 
 The API designed as a REST APIs with JSON payload.
 
-Transfer processing consists of the following steps:
+Transfer processing consists of the following steps (see picture below):
 - register transfer (single thread, thread-1)
 - validate transfer (single thread, thread-1)
 - withdraw money from the source account (single thread, thread-1)
@@ -31,7 +31,9 @@ Transfer processing consists of the following steps:
     - finalize transfer, check transfer state and update accordingly (single thread, thread-N)
     - complete transfer, save transfer to in-memory storage (single thread, thread-N)
 
-All these steps implemented as pipeline using `rxjava` library (see: https://github.com/volkodava/transfer-api/blob/master/src/main/java/com/demo/api/transfer/manager/PipelineExecutor.java#L69). 
+<img src="./docs/pipeline.png" alt="" style="width:600px;">
+
+All these steps implemented as pipeline using `rxjava` library (see: [PipelineExecutor.java#L69](./src/main/java/com/demo/api/transfer/manager/PipelineExecutor.java#L69)). 
 
 Java `ConcurrentHashMap` used as in-memory storage. Withdraw and deposit operations on accounts performed atomically. 
 
@@ -62,13 +64,43 @@ Mission critical pieces of applications covered with tests.
 
 - Execute unit + integration tests: `mvn integration-test`
 
+## Examples
+
+- To create account with initial balance of 1000 EUR:
+
+```bash
+curl -X POST "http://localhost:8080/accounts" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"initialBalance\":1000}"
+```
+account `id` will be returned in the JSON payload, `Location` header will contain link to account information API.
+
+- To request account information:
+
+```bash
+curl -X GET "http://localhost:8080/accounts/de07e939-55dd-4086-b559-86db399e51d5" -H  "accept: application/json"
+```
+
+- To transfer 10 EUR from account `de07e939-55dd-4086-b559-86db399e51d5` to account `8810b77a-f326-4e27-8e48-4e77a7f27e05`:
+
+```bash
+curl -X POST "http://localhost:8080/transfers" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"sourceAccountId\":\"de07e939-55dd-4086-b559-86db399e51d5\",\"targetAccountId\":\"8810b77a-f326-4e27-8e48-4e77a7f27e05\",\"amount\":10}"
+```
+account `id` will be returned in the JSON payload, `Location` header will contain link to transfer information API.
+
+- To request transfer information:
+
+```bash
+curl -X GET "http://localhost:8080/transfers/3d98e966-2a39-46e2-9afc-d2b7cf2285d4" -H  "accept: application/json"
+```
+
 ## CI/CD builds
 
 CI/CD Builds: https://github.com/volkodava/transfer-api/actions
 
 ## API Documentation
 
-<img src="./docs/swagger.png" width="300" height="300" alt="">
+API documentation available after application starts at `http://localhost:${PORT}/swagger-ui`.
+
+<img src="./docs/swagger.png" alt="" style="width:500px;">
 
 ## Project Structure
 

@@ -31,9 +31,9 @@ Transfer processing consists of the following steps (see picture below):
     - finalize transfer, check transfer state and update accordingly (single thread, thread-N)
     - complete transfer, save transfer to in-memory storage (single thread, thread-N)
 
-<img src="./docs/pipeline.png" alt="" style="width:600px;">
+<img src="./docs/pipeline.png" alt="">
 
-All these steps implemented as pipeline using `rxjava` library (see: [PipelineExecutor.java#L69](./src/main/java/com/demo/api/transfer/manager/PipelineExecutor.java#L69)). 
+All these steps implemented as pipeline using `rxjava` library (see: [PipelineExecutor.java#L66](./src/main/java/com/demo/api/transfer/manager/PipelineExecutor.java#L66)). 
 
 Java `ConcurrentHashMap` used as in-memory storage. Withdraw and deposit operations on accounts performed atomically. 
 
@@ -100,7 +100,7 @@ CI/CD Builds: https://github.com/volkodava/transfer-api/actions
 
 API documentation available after application starts at `http://localhost:${PORT}/swagger-ui`.
 
-<img src="./docs/swagger.png" alt="" style="width:500px;">
+<img src="./docs/swagger.png" alt="">
 
 ## Project Structure
 

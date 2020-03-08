@@ -10,7 +10,7 @@ public class SocketUtils {
 
     public static int findAvailablePort() {
         // private port range
-        int start = 49152;
+        int start = 8080;
         int end = 65535;
         int port = start;
         while (port <= end) {

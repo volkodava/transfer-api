@@ -55,7 +55,6 @@ public class InMemoryTransferManager implements TransferManager {
                 .withIsValidTransferFn(this::isValidTransfer)
                 .withWithdrawSourceFn(this::onWithdrawSource)
                 .withDepositTargetFn(this::onDepositTarget)
-                .withFinalizeTransferFn(this::onFinalizeTransfer)
                 .withCompleteTransferFn(this::onCompleteTransfer)
                 .withErrorHandler(this::onError)
                 .build();
@@ -80,20 +79,22 @@ public class InMemoryTransferManager implements TransferManager {
 
     private TransferEvent onValidateTransfer(TransferEvent event) {
         LOGGER.debug(String.format("%s --- onValidateTransfer: %s", Thread.currentThread().getName(), event));
+        TransferEvent newState;
         try {
             transferValidator.validate(event.getSourceId(), event.getTargetId(), event.getAmount());
-            return TransferEvent.builder().from(event)
+            newState = TransferEvent.builder().from(event)
                     .withState(TransferState.VALIDATED)
                     .withDetails("Transfer is valid")
                     .build();
         } catch (InvalidDataException e) {
-            TransferEvent newState = TransferEvent.builder().from(event)
+            newState = TransferEvent.builder().from(event)
                     .withState(TransferState.ERROR)
                     .withDetails(e.getMessage())
                     .build();
-            transferRepository.save(newState.getTransferId(), newState.asTransfer());
             return newState;
         }
+        transferRepository.save(newState.getTransferId(), newState.asTransfer());
+        return newState;
     }
 
     private boolean isValidTransfer(TransferEvent event) {
@@ -110,10 +111,12 @@ public class InMemoryTransferManager implements TransferManager {
                     .build();
         });
 
-        return TransferEvent.builder().from(event)
+        TransferEvent newState = TransferEvent.builder().from(event)
                 .withState(TransferState.SOURCE_WITHDRAWN)
                 .withDetails("Source account balance updated")
                 .build();
+        transferRepository.save(newState.getTransferId(), newState.asTransfer());
+        return newState;
     }
 
     private TransferEvent onDepositTarget(TransferEvent event) {
@@ -126,30 +129,29 @@ public class InMemoryTransferManager implements TransferManager {
                     .build();
         });
 
-        return TransferEvent.builder().from(event)
+        TransferEvent newState = TransferEvent.builder().from(event)
                 .withState(TransferState.TARGET_DEPOSITED)
                 .withDetails("Target account balance updated")
                 .build();
-    }
-
-    private TransferEvent onFinalizeTransfer(TransferEvent event) {
-        LOGGER.debug(String.format("%s --- onFinalizeTransfer: %s", Thread.currentThread().getName(), event));
-        if (TransferState.TARGET_DEPOSITED == event.getState()) {
-            return TransferEvent.builder().from(event)
-                    .withState(TransferState.DONE)
-                    .withDetails("Transfer processed")
-                    .build();
-        }
-
-        return TransferEvent.builder().from(event)
-                .withState(TransferState.ERROR)
-                .withDetails(String.format("Transfer is not valid: %s", event.getState()))
-                .build();
+        transferRepository.save(newState.getTransferId(), newState.asTransfer());
+        return newState;
     }
 
     private void onCompleteTransfer(TransferEvent event) {
         LOGGER.debug(String.format("%s --- onCompleteTransfer: %s", Thread.currentThread().getName(), event));
-        transferRepository.save(event.getTransferId(), event.asTransfer());
+        TransferEvent newState;
+        if (TransferState.TARGET_DEPOSITED == event.getState()) {
+            newState = TransferEvent.builder().from(event)
+                    .withState(TransferState.DONE)
+                    .withDetails("Transfer processed")
+                    .build();
+        } else {
+            newState = TransferEvent.builder().from(event)
+                    .withState(TransferState.ERROR)
+                    .withDetails(String.format("Transfer is not in a valid state: %s", event.getState()))
+                    .build();
+        }
+        transferRepository.save(newState.getTransferId(), newState.asTransfer());
     }
 
     private void onError(Throwable throwable) {

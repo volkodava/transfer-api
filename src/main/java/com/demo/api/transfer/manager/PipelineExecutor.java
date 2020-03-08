@@ -27,7 +27,6 @@ public class PipelineExecutor {
     private final Predicate<TransferEvent> isValidTransferFn;
     private final Function<TransferEvent, TransferEvent> withdrawSourceFn;
     private final Function<TransferEvent, TransferEvent> depositTargetFn;
-    private final Function<TransferEvent, TransferEvent> finalizeTransferFn;
     private final Consumer<TransferEvent> completeTransferFn;
     private final Consumer<Throwable> errorHandler;
 
@@ -41,7 +40,6 @@ public class PipelineExecutor {
                              Predicate<TransferEvent> isValidTransferFn,
                              Function<TransferEvent, TransferEvent> withdrawSourceFn,
                              Function<TransferEvent, TransferEvent> depositTargetFn,
-                             Function<TransferEvent, TransferEvent> finalizeTransferFn,
                              Consumer<TransferEvent> completeTransferFn,
                              Consumer<Throwable> errorHandler) {
         this.eventSource = Objects.requireNonNull(eventSource, "Event source must be provided");
@@ -51,7 +49,6 @@ public class PipelineExecutor {
         this.isValidTransferFn = Objects.requireNonNull(isValidTransferFn, "IsValid transfer function must be provided");
         this.withdrawSourceFn = Objects.requireNonNull(withdrawSourceFn, "Withdraw source function must be provided");
         this.depositTargetFn = Objects.requireNonNull(depositTargetFn, "Deposit target function must be provided");
-        this.finalizeTransferFn = Objects.requireNonNull(finalizeTransferFn, "Finalize transfer function must be provided");
         this.completeTransferFn = Objects.requireNonNull(completeTransferFn, "Complete transfer function must be provided");
         this.errorHandler = Objects.requireNonNull(errorHandler, "Error handler must be provided");
         this.running = new AtomicBoolean(false);
@@ -77,7 +74,6 @@ public class PipelineExecutor {
                 .groupBy(event -> partitioner.updateAndGet(i -> Math.max(i + 1, 0)) % config.getMaxThreads())
                 .flatMap(grp -> grp.observeOn(Schedulers.io())
                         .map(depositTargetFn::apply)) // deposit in parallel
-                .map(finalizeTransferFn::apply)
                 .subscribe(completeTransferFn::accept);
         nonValidSubscriber = flow.filter(isNonValidTransferFn::test)
                 .subscribe(completeTransferFn::accept);
@@ -120,7 +116,6 @@ public class PipelineExecutor {
         private Predicate<TransferEvent> isValidTransferFn;
         private Function<TransferEvent, TransferEvent> withdrawSourceFn;
         private Function<TransferEvent, TransferEvent> depositTargetFn;
-        private Function<TransferEvent, TransferEvent> finalizeTransferFn;
         private Consumer<TransferEvent> completeTransferFn;
         private Consumer<Throwable> errorHandler;
 
@@ -159,11 +154,6 @@ public class PipelineExecutor {
             return this;
         }
 
-        public Builder withFinalizeTransferFn(Function<TransferEvent, TransferEvent> finalizeTransferFn) {
-            this.finalizeTransferFn = finalizeTransferFn;
-            return this;
-        }
-
         public Builder withCompleteTransferFn(Consumer<TransferEvent> completeTransferFn) {
             this.completeTransferFn = completeTransferFn;
             return this;
@@ -176,7 +166,7 @@ public class PipelineExecutor {
 
         public PipelineExecutor build() {
             return new PipelineExecutor(eventSource, config, registerTransferFn, validateTransferFn, isValidTransferFn, withdrawSourceFn,
-                    depositTargetFn, finalizeTransferFn, completeTransferFn, errorHandler);
+                    depositTargetFn, completeTransferFn, errorHandler);
         }
     }
 }

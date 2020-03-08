@@ -21,12 +21,24 @@ public class DebitTransferValidator implements TransferValidator {
 
     @Override
     public void validate(AccountId sourceAccountId, AccountId targetAccountId, BigDecimal amount) {
-        Objects.requireNonNull(sourceAccountId, "Source account id must be provided");
-        Objects.requireNonNull(targetAccountId, "Target account id must be provided");
-        Objects.requireNonNull(amount, "Amount must be provided");
+        if (sourceAccountId == null) {
+            throw new InvalidDataException("Source account id must be provided");
+        }
+        if (targetAccountId == null) {
+            throw new InvalidDataException("Target account id must be provided");
+        }
+        if (amount == null) {
+            throw new InvalidDataException("Amount must be provided");
+        }
 
-        Account source = Objects.requireNonNull(accountService.findById(sourceAccountId), "Account doesn't exist");
-        Account target = Objects.requireNonNull(accountService.findById(targetAccountId), "Account doesn't exist");
+        Account source = accountService.findById(sourceAccountId);
+        if (source == null) {
+            throw new InvalidDataException("Source account not found");
+        }
+        Account target = accountService.findById(targetAccountId);
+        if (target == null) {
+            throw new InvalidDataException("Target account not found");
+        }
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidDataException("Transfer must be a positive decimal number");

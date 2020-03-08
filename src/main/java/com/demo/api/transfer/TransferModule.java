@@ -1,5 +1,6 @@
 package com.demo.api.transfer;
 
+import com.demo.api.transfer.controller.TransferControllerModule;
 import com.demo.api.transfer.manager.TransferManagerModule;
 import com.demo.api.transfer.repository.TransferRepositoryModule;
 import com.demo.api.transfer.service.TransferServiceModule;
@@ -24,5 +25,6 @@ public class TransferModule extends AbstractModule {
         install(new EventStoreModule(config));
         install(new TransferManagerModule());
         install(new TransferServiceModule());
+        install(new TransferControllerModule());
     }
 }

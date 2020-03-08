@@ -31,6 +31,9 @@ Transfer processing consists of the following steps:
 
 Java `ConcurrentHashMap` used as in-memory storage. Withdraw and deposit operations on accounts performed atomically. 
 
+Throttling of transfer requests implemented using Java `BlockingQueue`, 
+which is also used as communication channel between service (accept transfer requests) and pipeline executor (process transfer requests). 
+
 Mission critical pieces of applications covered with tests.
 
 ## Tools, Frameworks, Libraries

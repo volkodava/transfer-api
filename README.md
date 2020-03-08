@@ -31,6 +31,8 @@ Transfer processing consists of the following steps:
     - finalize transfer, check transfer state and update accordingly (single thread, thread-N)
     - complete transfer, save transfer to in-memory storage (single thread, thread-N)
 
+All these steps implemented as pipeline using `rxjava` library (see: https://github.com/volkodava/transfer-api/blob/master/src/main/java/com/demo/api/transfer/manager/PipelineExecutor.java#L69). 
+
 Java `ConcurrentHashMap` used as in-memory storage. Withdraw and deposit operations on accounts performed atomically. 
 
 Throttling of transfer requests implemented using Java `BlockingQueue`, 
@@ -66,7 +68,7 @@ CI/CD Builds: https://github.com/volkodava/transfer-api/actions
 
 ## API Documentation
 
-TBD
+<img src="./docs/swagger.png" width="300" height="300" alt="">
 
 ## Project Structure
 

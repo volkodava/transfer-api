@@ -1,4 +1,6 @@
 # transfer-api
+![](https://github.com/volkodava/transfer-api/workflows/transfer-api/badge.svg)
+
 A simple money transfer REST API implementation with concurrency
 
 ## Features

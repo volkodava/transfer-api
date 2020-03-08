@@ -1,27 +1,25 @@
 package com.demo.api.account.service;
 
-import com.demo.api.account.model.Account;
+import com.demo.api.account.AccountModule;
 import com.demo.api.model.AccountId;
 import com.demo.common.InvalidDataException;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import net.lamberto.junit.GuiceJUnitRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@RunWith(GuiceJUnitRunner.class)
+@GuiceJUnitRunner.GuiceModules(AccountServiceTest.TestModule.class)
 public class AccountServiceTest {
-    private AccountService accountService = new AccountService() {
-        @Override
-        public AccountId createNew(BigDecimal initialBalance) {
-            throw new UnsupportedOperationException();
-        }
 
-        @Override
-        public Account findById(AccountId accountId) {
-            throw new UnsupportedOperationException();
-        }
-    };
+    @Inject
+    private AccountService accountService;
 
     @Test
     public void shouldCreateAccountWithPositiveBalance() {
@@ -56,5 +54,11 @@ public class AccountServiceTest {
 
         // When
         accountService.createNew(positiveBalance); // exception should be thrown
+    }
+
+    public static class TestModule extends AbstractModule {
+        protected void configure() {
+            install(new AccountModule());
+        }
     }
 }

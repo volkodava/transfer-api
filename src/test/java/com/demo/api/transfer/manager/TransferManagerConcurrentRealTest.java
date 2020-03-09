@@ -17,8 +17,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,8 +30,6 @@ import static org.hamcrest.Matchers.equalTo;
 @RunWith(GuiceJUnitRunner.class)
 @GuiceJUnitRunner.GuiceModules(TransferManagerConcurrentRealTest.TestModule.class)
 public class TransferManagerConcurrentRealTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransferManagerConcurrentRealTest.class);
-
     private static final long ASYNC_WAIT_IN_MS = 10000;
     private static final int BUFFER_SIZE = 10000;
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
@@ -87,7 +83,6 @@ public class TransferManagerConcurrentRealTest {
                         waitForTransferToComplete(transferId);
                         completed.incrementAndGet();
                     } catch (InterruptedException | ExecutionException e) {
-                        LOGGER.error("Error retrieving result", e);
                         throw new RuntimeException(e);
                     }
                 });

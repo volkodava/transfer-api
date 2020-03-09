@@ -62,10 +62,11 @@ public class PipelineExecutor {
         running.set(true);
         AtomicInteger partitioner = new AtomicInteger(0);
         Predicate<TransferEvent> isNonValidTransferFn = isValidTransferFn.negate();
-        // withdraw in single thread
+        // register -> validate -> withdraw: done in single thread
+        // deposit -> complete: done in separate thread
         ConnectableFlowable<TransferEvent> flow = createFlow()
                 .onErrorResumeNext(this::onError)
-                .subscribeOn(Schedulers.single()) // withdraw in single thread
+                .subscribeOn(Schedulers.single())
                 .map(registerTransferFn::apply)
                 .map(validateTransferFn::apply)
                 .publish();
@@ -73,7 +74,7 @@ public class PipelineExecutor {
                 .map(withdrawSourceFn::apply)
                 .groupBy(event -> partitioner.updateAndGet(i -> Math.max(i + 1, 0)) % config.getMaxThreads())
                 .flatMap(grp -> grp.observeOn(Schedulers.io())
-                        .map(depositTargetFn::apply)) // deposit in parallel
+                        .map(depositTargetFn::apply))
                 .subscribe(completeTransferFn::accept);
         nonValidSubscriber = flow.filter(isNonValidTransferFn::test)
                 .subscribe(completeTransferFn::accept);

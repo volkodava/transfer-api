@@ -18,7 +18,7 @@ A simple money transfer REST API implementation with concurrency
 
 ## Notes
 
-Solution done with assumption that we deal only with debit accounts.
+Assumption: solution operates only with debit accounts.
 
 The API designed as a REST APIs with JSON payload.
 
@@ -33,23 +33,23 @@ Transfer processing consists of the following steps (see picture below):
 
 <img src="./docs/pipeline.png" alt="">
 
-All these steps implemented as pipeline using `rxjava` library (see: [PipelineExecutor.java#L66](./src/main/java/com/demo/api/transfer/manager/PipelineExecutor.java#L66)). 
+All these steps implemented as pipeline using `rxjava` library (see: [PipelineExecutor.java#L67](./src/main/java/com/demo/api/transfer/manager/PipelineExecutor.java#L67)).
 
 Java `ConcurrentHashMap` used as in-memory storage. Withdraw and deposit operations on accounts performed atomically. 
 
 Throttling of transfer requests implemented using Java `BlockingQueue`, 
 which is also used as communication channel between service (accept transfer requests) and pipeline executor (process transfer requests). 
 
-Mission critical pieces of applications covered with tests.
+Mission critical pieces of application covered with tests.
 
 ## Tools, Frameworks, Libraries
 
 - Java 11+
 - [Maven](https://maven.apache.org/) build-automation tool
-- [javalin](https://javalin.io/) lightweight web framework to create REST APIs
+- [javalin](https://javalin.io/) lightweight web framework for REST APIs
 - [guice](https://github.com/google/guice) lightweight dependency injection framework
 - [rxjava](https://github.com/ReactiveX/RxJava) library for asynchronous programming
-- [Swagger UI](https://swagger.io/tools/swagger-ui/) library for visual documentation
+- [Swagger UI](https://swagger.io/tools/swagger-ui/) library for REST APIs documentation
 
 ## How to run the demo
 

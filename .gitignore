@@ -5,9 +5,5 @@ target
 .classpath
 .project
 .settings/
-*.sh
-vegeta
-payload.json
-experiments
 dependency-reduced-pom.xml
 *.log

@@ -91,9 +91,9 @@ account `id` will be returned in the JSON payload, `Location` header will contai
 curl -X GET "http://localhost:8080/transfers/3d98e966-2a39-46e2-9afc-d2b7cf2285d4" -H  "accept: application/json"
 ```
 
-## CI/CD builds
+## CI builds
 
-CI/CD Builds: https://github.com/volkodava/transfer-api/actions
+Link: https://github.com/volkodava/transfer-api/actions
 
 ## API Documentation
 

@@ -28,7 +28,6 @@ Transfer processing consists of the following steps (see picture below):
 - withdraw money from the source account (single thread, thread-1)
 - (partition into blocks of threads)
     - deposit money to the target account (single thread, thread-N)
-    - finalize transfer, check transfer state and update accordingly (single thread, thread-N)
     - complete transfer, save transfer to in-memory storage (single thread, thread-N)
 
 <img src="./docs/pipeline.png" alt="">

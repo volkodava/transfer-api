@@ -21,23 +21,23 @@ import java.util.Objects;
 
 public class BootstrapModule extends AbstractModule {
 
-    private final BootstrapConfig config;
+    private final BootstrapConfig bootstrapConfig;
 
-    public BootstrapModule(BootstrapConfig config) {
-        this.config = Objects.requireNonNull(config, "Config must be provided");
+    public BootstrapModule(BootstrapConfig bootstrapConfig) {
+        this.bootstrapConfig = Objects.requireNonNull(bootstrapConfig, "Config must be provided");
     }
 
     protected void configure() {
-        bind(BootstrapConfig.class).toInstance(config);
+        bind(BootstrapConfig.class).toInstance(bootstrapConfig);
         bind(Javalin.class).toInstance(createApp());
         install(new AccountModule());
-        install(new TransferModule(config));
+        install(new TransferModule(bootstrapConfig));
         bind(WebContext.class);
     }
 
     private Javalin createApp() {
         return Javalin.create(config -> {
-            config.registerPlugin(getConfiguredOpenApiPlugin());
+            config.registerPlugin(getConfiguredOpenApiPlugin(bootstrapConfig));
             config.showJavalinBanner = false;
             config.enableCorsForAllOrigins();
             config.defaultContentType = "application/json";
@@ -59,13 +59,13 @@ public class BootstrapModule extends AbstractModule {
         });
     }
 
-    private OpenApiPlugin getConfiguredOpenApiPlugin() {
-        Info info = new Info().version("1.0").title("Money Transfer API");
+    private OpenApiPlugin getConfiguredOpenApiPlugin(BootstrapConfig config) {
+        Info info = new Info().version(config.getVersion()).title(config.getArtifactId());
         OpenApiOptions options = new OpenApiOptions(info)
-                .activateAnnotationScanningFor("com.demo")
-                .path(String.format("/%s", config.getSwaggerDocsBaseUrl()))
-                .swagger(new SwaggerOptions(String.format("/%s", config.getSwaggerUiBaseUrl())))
-                .reDoc(new ReDocOptions(String.format("/%s", config.getRedocBaseUrl())))
+                .activateAnnotationScanningFor(getClass().getPackageName())
+                .path(String.format("/%s", this.bootstrapConfig.getSwaggerDocsBaseUrl()))
+                .swagger(new SwaggerOptions(String.format("/%s", this.bootstrapConfig.getSwaggerUiBaseUrl())))
+                .reDoc(new ReDocOptions(String.format("/%s", this.bootstrapConfig.getRedocBaseUrl())))
                 .defaultDocumentation(doc -> {
                     doc.json("500", ErrorResponse.class);
                 });

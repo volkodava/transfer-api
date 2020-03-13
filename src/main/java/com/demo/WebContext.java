@@ -1,8 +1,8 @@
 package com.demo;
 
+import com.demo.api.common.Routing;
 import com.demo.api.transfer.manager.TransferManager;
 import com.demo.common.BootstrapConfig;
-import com.demo.api.common.Routing;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.javalin.Javalin;

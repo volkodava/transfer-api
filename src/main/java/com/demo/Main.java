@@ -12,6 +12,9 @@ import java.util.Optional;
 public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
+    private static final int DEFAULT_BUFFER_SIZE = 10000;
+    private static final int DEFAULT_MAX_THREADS = Runtime.getRuntime().availableProcessors();
+
     public static void main(String[] args) {
         BootstrapConfig config = buildConfig();
         LOGGER.info(String.format("Application configuration: %s", config));
@@ -25,15 +28,12 @@ public class Main {
 
     private static BootstrapConfig buildConfig() {
         int port = getEnvAsInt("PORT").orElse(SocketUtils.findAvailablePort());
-        int bufferSize = getEnvAsInt("BUFFER_SIZE").orElse(10000);
-        int maxThreads = getEnvAsInt("MAX_THREADS").orElse(Runtime.getRuntime().availableProcessors());
+        int bufferSize = getEnvAsInt("BUFFER_SIZE").orElse(DEFAULT_BUFFER_SIZE);
+        int maxThreads = getEnvAsInt("MAX_THREADS").orElse(DEFAULT_MAX_THREADS);
         return BootstrapConfig.builder()
                 .withPort(port)
                 .withBufferSize(bufferSize)
                 .withMaxThreads(maxThreads)
-                .withSwaggerUiBaseUrl("swagger-ui")
-                .withSwaggerDocsBaseUrl("swagger-docs")
-                .withRedocBaseUrl("redoc")
                 .build();
     }
 
